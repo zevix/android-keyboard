@@ -62,6 +62,7 @@ import org.futo.inputmethod.engine.IMEInterface;
 import org.futo.inputmethod.engine.IMEManager;
 import org.futo.inputmethod.event.Event;
 import org.futo.inputmethod.event.HardwareEventDecoder;
+import org.futo.inputmethod.event.HardwareKeyHooks;
 import org.futo.inputmethod.event.HardwareKeyboardEventDecoder;
 import org.futo.inputmethod.event.InputTransaction;
 import org.futo.inputmethod.keyboard.Keyboard;
@@ -890,7 +891,9 @@ public class LatinIMELegacy implements KeyboardActionListener,
         final HardwareEventDecoder decoder = mHardwareEventDecoders.get(deviceId);
         if (null != decoder) return decoder;
         // TODO: create the decoder according to the specification
-        final HardwareEventDecoder newDecoder = new HardwareKeyboardEventDecoder(deviceId);
+        final HardwareKeyHooks.HardwareEventDecoderFactory factory = HardwareKeyHooks.factory();
+        final HardwareEventDecoder newDecoder = factory != null
+                ? factory.create(deviceId) : new HardwareKeyboardEventDecoder(deviceId);
         mHardwareEventDecoders.put(deviceId, newDecoder);
         return newDecoder;
     }
@@ -902,7 +905,7 @@ public class LatinIMELegacy implements KeyboardActionListener,
                     mInputMethodService.getApplicationContext().getResources());
         }
         mEmojiAltPhysicalKeyDetector.onKeyDown(keyEvent);
-        if (!ProductionFlags.IS_HARDWARE_KEYBOARD_SUPPORTED) {
+        if (!ProductionFlags.IS_HARDWARE_KEYBOARD_SUPPORTED && !HardwareKeyHooks.isInstalled()) {
             return false;
         }
         final Event event = getHardwareKeyEventDecoder(
@@ -910,6 +913,8 @@ public class LatinIMELegacy implements KeyboardActionListener,
         // If the event is not handled by LatinIME, we just pass it to the parent implementation.
         // If it's handled, we return true because we did handle it.
         if (event.isHandled()) {
+            // A consumed event (only produced by an installed HardwareKeyHooks decoder) swallows the key.
+            if (event.isConsumed()) return true;
             mImeManager.getActiveIME(
                     mSettings.getCurrent()
             ).onEvent(event);
@@ -924,8 +929,11 @@ public class LatinIMELegacy implements KeyboardActionListener,
                     mInputMethodService.getApplicationContext().getResources());
         }
         mEmojiAltPhysicalKeyDetector.onKeyUp(keyEvent);
-        if (!ProductionFlags.IS_HARDWARE_KEYBOARD_SUPPORTED) {
+        if (!ProductionFlags.IS_HARDWARE_KEYBOARD_SUPPORTED && !HardwareKeyHooks.isInstalled()) {
             return false;
+        }
+        if (HardwareKeyHooks.isInstalled()) {
+            return getHardwareKeyEventDecoder(keyEvent.getDeviceId()).consumesKeyUp(keyEvent);
         }
         final long keyIdentifier = keyEvent.getDeviceId() << 32 + keyEvent.getKeyCode();
         // TODO: Seems unused, nothing is ever even added to this set, so this is always false

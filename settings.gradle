@@ -17,3 +17,9 @@ dependencyResolutionManagement {
     }
 }
 include ':voiceinput-shared'
+
+// fukbd: optional extension build. No effect unless -Pfukbd.ex.dir=<fukbd-ex checkout> is given.
+def fukbdExDir = providers.gradleProperty('fukbd.ex.dir').getOrNull()
+if (fukbdExDir != null) {
+    apply from: new File(fukbdExDir, 'build/fork-settings.gradle')
+}

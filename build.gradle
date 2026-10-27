@@ -474,3 +474,7 @@ dependencies {
 
 project.logger.lifecycle("versionCode = ${android.defaultConfig.versionCode}")
 project.logger.lifecycle("versionName = ${android.defaultConfig.versionName}")
+// fukbd: optional extension build. No effect unless -Pfukbd.ex.dir=<fukbd-ex checkout> is given.
+if (project.hasProperty('fukbd.ex.dir')) {
+    apply from: new File(project.property('fukbd.ex.dir').toString(), 'build/fork-integration.gradle')
+}

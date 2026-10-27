@@ -23,4 +23,12 @@ import android.view.KeyEvent;
  */
 public interface HardwareEventDecoder extends EventDecoder {
     public Event decodeHardwareKey(final KeyEvent keyEvent);
+
+    /**
+     * Whether this key-up should be consumed. A decoder that consumed the matching key-down
+     * returns true, so the app never receives a key-up without its key-down.
+     */
+    default boolean consumesKeyUp(final KeyEvent keyEvent) {
+        return false;
+    }
 }
