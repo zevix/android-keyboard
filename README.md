@@ -1,5 +1,11 @@
 # FUTO Keyboard
 
+> **Modified by the fukbd project.** This is a modified copy of FUTO Keyboard (zevix/android-keyboard),
+> distributed under the FUTO Source First License 1.1 (`LICENSE.md`, unchanged). The changes are an optional
+> hardware-key decoder hook (`java/src/org/futo/inputmethod/event/HardwareKeyHooks.java`) and build lines that
+> apply [fukbd-ex](https://github.com/zevix/fukbd-ex) only when `-Pfukbd.ex.dir` is given. Builds without that
+> property are stock FUTO Keyboard. This is not an official FUTO build.
+
 The goal is to make a good modern keyboard that stays offline and doesn't spy on you. This keyboard is a fork of [LatinIME, The Android Open-Source Keyboard](https://android.googlesource.com/platform/packages/inputmethods/LatinIME), with significant changes made to it.
 
 Check out the [FUTO Keyboard website](https://keyboard.futo.tech/) for downloads and more information.
